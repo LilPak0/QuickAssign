@@ -1,6 +1,6 @@
 const { createEmployee, findEmployee, findEmployeesBySpecialty, updateEmployee, deleteEmployee } = require('../data/employees')
 
-const especialties = [ "Frontend Developer", "Backend Developer", "FullStack Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester", "Tech Lead" ]
+const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
 
 // inserir employee na DB
 async function insertEmployee (data) {
@@ -8,7 +8,7 @@ async function insertEmployee (data) {
     const { firstName, lastName, birthDate, email, specialty, experience, skills, projects } = data
 
     // verificar se especialidade é válida
-    if (!especialties.includes(specialty)) {
+    if (!specialties.includes(specialty)) {
         throw new Error("Invalid Specialty");
     }
 
@@ -29,7 +29,7 @@ async function insertEmployee (data) {
     }
 
     // experience deve ser um numero e maior que 0
-    if (typeof experience !== "number" || experience < 0) {
+    if (typeof experience !== "string" || experience < 0) {
         throw new Error("Invalid experience value");
     }
 
@@ -41,11 +41,11 @@ async function insertEmployee (data) {
 
 
 // filtrar funcionários por especialidade
-async function filterEmployeesBySpecialty (speciality) {
-    if(!speciality) {
+async function filterEmployeesBySpecialty (specialty) {
+    if(!specialty) {
         throw new Error ("Invalid Specialty")
     }
-    const result = await findEmployeesBySpecialty(speciality)
+    const result = await findEmployeesBySpecialty(specialty)
     return result
 }
 
