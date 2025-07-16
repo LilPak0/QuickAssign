@@ -1,4 +1,4 @@
-const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee, findEmployeesByProperty, findEmployees } = require('../data/employees')
+const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
 
@@ -40,16 +40,6 @@ async function insertEmployee (data) {
 }
 
 
-// filtrar funcionários por especialidade
-async function filterEmployeesByProperty (property) {
-    if(!property) {
-        throw new Error ("Invalid Specialty")
-    }
-    const result = await findEmployeesByProperty(property)
-    return result
-}
-
-
 
 // filtrar por especialidade e experiencia (opcional)
 async function filterEmployees({ specialty, experience }) {
@@ -73,4 +63,6 @@ async function filterEmployees({ specialty, experience }) {
 
 
 
-module.exports = { insertEmployee, filterEmployeesByProperty, filterEmployees }
+
+
+module.exports = { insertEmployee, filterEmployees }
