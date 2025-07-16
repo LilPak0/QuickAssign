@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiX } from 'react-icons/fi';
 
+
 export function ProjectPopup({ isOpen, onClose, onSubmit }) {
   const [project, setProject] = useState({
     name: '',
@@ -31,6 +32,11 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
         <form onSubmit={(e) => {
           e.preventDefault();
           onSubmit(project);
+          project.name = '';
+            project.client = '';
+          project.description = '';
+            project.requirements = { backend: 1, frontend: 1, design: 1 };
+
         }}>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
@@ -51,6 +57,18 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
                   type="text"
                   name="name"
                   value={project.name}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+                <input
+                  type="text"
+                  name="client"
+                  value={project.client}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                   required

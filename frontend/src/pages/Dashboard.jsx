@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { FiFilter, FiPlus } from 'react-icons/fi';
 import { ProjectPopup } from '../components/Project_popup';
+import { ProjectCard } from '../components/Project_Card';
 
 export default function DashBoard() {
   const [showFilters, setShowFilters] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false); 
+    const [projects, setProjects] = useState([]); // Store created projects
+
   
   // Mock team data
   const teamMembers = [
@@ -21,9 +24,12 @@ export default function DashBoard() {
   };
 
   const handleSubmitProject = (projectData) => {
-    console.log('New project created:', projectData);
-    // Here you would typically send the data to your backend
-    setIsPopupOpen(false); // Close the popup after submission
+    setProjects([...projects, {
+      ...projectData,
+      id: Date.now(), // Simple unique ID
+      createdAt: new Date().toISOString()
+    }]);
+    setIsPopupOpen(false);
   };
 
   return (
@@ -102,16 +108,44 @@ export default function DashBoard() {
         </div>
       </div>
 
-      {/* Empty Right Side with (+) Button */}
-      <div className="flex-1 relative">
-        {/* Add Project Button */}
-        <button
-          onClick={() => setIsPopupOpen(true)}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-white transition-transform hover:scale-105"
-        >
-          <FiPlus size={24} />
-        </button>
+       {/* Main Content Area */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">My Projects</h1>
+        
+        {/* Projects Grid */}
+        {projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map(project => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center py-12">
+            <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <FiPlus className="text-gray-400" size={40} />
+            </div>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">No projects yet</h3>
+            <p className="text-gray-500 mb-6">Create your first project to get started</p>
+            <button
+              onClick={() => setIsPopupOpen(true)}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Create Project
+            </button>
+          </div>
+        )}
+
+        {/* Floating Action Button */}
+        {projects.length > 0 && (
+          <button
+            onClick={() => setIsPopupOpen(true)}
+            className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-white transition-transform hover:scale-105"
+          >
+            <FiPlus size={24} />
+          </button>
+        )}
       </div>
+
       {/* Project Popup Component */}
       <ProjectPopup 
         isOpen={isPopupOpen}
