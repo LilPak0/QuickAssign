@@ -17,9 +17,9 @@ async function findEmployee (data) {
 }
 
 // Read Employees by Especialty
-async function findEmployeesByEspecialty (especialty) {
+async function findEmployeesBySpecialty (speciality) {
     const collection = await getCollection("employee");
-    const result = await collection.find({ especialty: especialty}).toArray()
+    const result = await collection.find({ speciality: speciality}).toArray()
     return result
 }
 
@@ -36,7 +36,7 @@ async function deleteEmployee (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesByEspecialty }
+module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesBySpecialty }
 
 /*
 // Count users checked-in

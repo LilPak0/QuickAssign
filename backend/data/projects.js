@@ -36,7 +36,7 @@ async function deleteProject (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createProject, findProject, updateProject, deleteProject }
+module.exports = { createProject, findProject, findProjectsByStatus, updateProject, deleteProject }
 
 /*
 // Count users checked-in

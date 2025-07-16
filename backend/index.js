@@ -10,8 +10,11 @@ app.use(express.json())
 const cors = require('cors')
 app.use(cors());
 
+const employeeRoutes = require('./routes/employees.route')
 
+app.use('/api/employee', employeeRoutes);
 
+module.exports = app;
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
