@@ -1,6 +1,6 @@
 // CRUD - CREATE, READ, UPDATE, DELETE
 
-const {getCollection, getConnection, closeConnection} = require("mongodb")
+const {getCollection, getConnection, closeConnection} = require("../config/mongodb")
 
 // Create Projects
 async function createProject (data) {

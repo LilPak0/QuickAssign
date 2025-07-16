@@ -14,7 +14,7 @@ const employeeRoutes = require('./routes/employees.route');
 const projectsRoutes = require('./routes/projects.route');
 
 app.use('/api/employees', employeeRoutes);
-app.use('api/projects', projectsRoutes)
+app.use('/api/projects', projectsRoutes)
 
 module.exports = app;
 

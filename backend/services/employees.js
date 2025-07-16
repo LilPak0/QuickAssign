@@ -1,6 +1,7 @@
-const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee, findEmployeesByProperty } = require('../data/employees')
+const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
+const validExperiences = ["Junior", "Mid-level", "Senior"];
 
 // inserir employee na DB
 async function insertEmployee (data) {
@@ -28,8 +29,8 @@ async function insertEmployee (data) {
         throw new Error("Projects must be an array");
     }
 
-    // experience deve ser um numero e maior que 0
-    if (typeof experience !== "string" || experience < 0) {
+    // experience deve ser um destes parâmetros
+    if (!validExperiences.includes(experience)) {
         throw new Error("Invalid experience value");
     }
 
@@ -37,16 +38,6 @@ async function insertEmployee (data) {
     const id = await createEmployee(employeeInfo);
 
     return id;
-}
-
-
-// filtrar funcionários por especialidade
-async function filterEmployeesByProperty (property) {
-    if(!property) {
-        throw new Error ("Invalid Specialty")
-    }
-    const result = await findEmployeesByProperty(property)
-    return result
 }
 
 
@@ -73,4 +64,6 @@ async function filterEmployees({ specialty, experience }) {
 
 
 
-module.exports = { insertEmployee, filterEmployeesByProperty, filterEmployees }
+
+
+module.exports = { insertEmployee, filterEmployees }

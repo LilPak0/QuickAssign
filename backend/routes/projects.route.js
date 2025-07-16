@@ -1,5 +1,5 @@
 const express = require('express');
-const { insertProject } = require('../services/projects');
+const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment } = require('../services/projects');
 const { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const router = express.Router();
 
@@ -28,7 +28,8 @@ router.get('/all', async (req, res) => {
 // GET filtrar projects by status
 router.get('/filters', async (req, res) => {
     try {
-        const { status } = req.body
+        // Ler do URL o status (In Progress || Completed)
+        const { status } = req.query
         const result = await findProjectsByStatus(status)
 
         res.status(200).json(result)
@@ -37,6 +38,7 @@ router.get('/filters', async (req, res) => {
     }
 })
 
+// Remover projeto
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id
@@ -46,5 +48,31 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(500).json({ error: err.message })
     }
 })
+
+// Adicionar ID ao slot vazio
+router.post('/:id/assign-slot', async (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const { employeeId, specialty, slotIndex } = req.body
+
+        const addSlot = await assignEmployeeToSlot({projectId, employeeId, specialty, slotIndex})
+        return res.status(200).json(addSlot)
+    } catch (err) {
+        return res.status(500).json( {error: err.message })
+    }
+})
+
+// Retirar ID do slot
+router.post('/:projectId/unassign-slot', async (req, res) => {
+  try {
+    const { employeeId } = req.body;
+    const { projectId } = req.params;
+
+    const result = await removeEmployeeFromAssignment({ projectId, employeeId });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 module.exports = router;
