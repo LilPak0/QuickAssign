@@ -151,15 +151,19 @@ export default function DashBoard() {
 
   // Role colors
   const roleColors = {
-    backend: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
-    frontend: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
-    design: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' }
+    "Backend Developer": { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
+    "Frontend Developer": { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+    "Designer UX/UI": { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
+    "DevOps Engineer": { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
+    "Data Analyst": { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
+    "Business Analyst": { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
+    "QA Engineer/Tester": { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
   };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 80,
+        delay: 120,
         tolerance: 5,
       },
     }),

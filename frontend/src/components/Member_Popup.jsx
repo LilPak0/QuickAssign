@@ -1,6 +1,6 @@
 import { FiX } from 'react-icons/fi';
 
-export const MemberPopup = ({ member, onClose, roleColors }) => {
+const MemberPopup = ({ member, onClose, roleColors }) => {
   if (!member) return null;
 
   return (
@@ -50,8 +50,8 @@ export const MemberPopup = ({ member, onClose, roleColors }) => {
 
         <div className="mb-4">
           <h3 className="font-medium text-gray-700 mb-2">Contact</h3>
-          <p className="text-gray-600">{member.email}</p>
-          <p className="text-gray-600">{member.phone}</p>
+          <p className="text-gray-600">email@example.com</p>
+          <p className="text-gray-600">+1 (555) 123-4567</p>
         </div>
 
         <button
@@ -64,3 +64,5 @@ export const MemberPopup = ({ member, onClose, roleColors }) => {
     </div>
   );
 };
+
+export default MemberPopup;
