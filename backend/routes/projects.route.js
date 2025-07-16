@@ -1,5 +1,5 @@
 const express = require('express');
-const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment } = require('../services/projects');
+const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment, checkAndStartProject, finishProject } = require('../services/projects');
 const { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.get('/filters', async (req, res) => {
     }
 })
 
-// Remover projeto
+// DELETE Remover projeto
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id
@@ -49,7 +49,7 @@ router.delete('/delete/:id', async (req, res) => {
     }
 })
 
-// Adicionar ID ao slot vazio
+// POST Adicionar ID ao slot vazio
 router.post('/:id/assign-slot', async (req, res) => {
     try {
         const projectId = req.params.id;
@@ -62,8 +62,8 @@ router.post('/:id/assign-slot', async (req, res) => {
     }
 })
 
-// Retirar ID do slot
-router.post('/:projectId/unassign-slot', async (req, res) => {
+// POST Retirar ID do slot
+router.post('/:id/unassign-slot', async (req, res) => {
   try {
     const { employeeId } = req.body;
     const { projectId } = req.params;
@@ -74,5 +74,27 @@ router.post('/:projectId/unassign-slot', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+// POST start project
+app.post('/:id/start', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await checkAndStartProject(id);
+        res.status(200).json({ message: "Project in progress", data: result})
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// POST finish match
+app.post('/:id/finish', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await finishProject(id);
+        res.status(200).json({ message: "Project completed", data: result})
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
 
 module.exports = router;
