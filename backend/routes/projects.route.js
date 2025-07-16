@@ -38,6 +38,7 @@ router.get('/filters', async (req, res) => {
     }
 })
 
+// Remover projeto
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id
@@ -48,6 +49,7 @@ router.delete('/delete/:id', async (req, res) => {
     }
 })
 
+// Adicionar ID ao slot vazio
 router.post('/:id/assign-slot', async (req, res) => {
     try {
         const projectId = req.params.id;
@@ -60,6 +62,7 @@ router.post('/:id/assign-slot', async (req, res) => {
     }
 })
 
+// Retirar ID do slot
 router.post('/:projectId/unassign-slot', async (req, res) => {
   try {
     const { employeeId } = req.body;
@@ -71,4 +74,5 @@ router.post('/:projectId/unassign-slot', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 module.exports = router;
