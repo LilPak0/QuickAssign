@@ -32,17 +32,18 @@ async function insertProject (data) {
 
     // confirmação se não há campos vazios
     if (!title || !client || !description || !projectNeeds || !deadline) {
-        throw new Error("There is blank spaces");
+        throw new Error("All fields are required: title, client, description, projectNeeds, deadline.");
     }
 
-    // criação de variáveis data
+    /*// criação de variáveis data
     const start = new Date(projectStart);
     const end = new Date(deadline);
 
     if (end < start) {
         throw new Error("Invalid date");
     }
-    
+     */
+
     if (!Array.isArray(projectNeeds)) {
         throw new Error("teamProject deve ser um array");
     }
@@ -62,15 +63,17 @@ async function assignEmployeeToSlot({ projectId, employeeId, specialty, slotInde
     if (!employee) {
         throw new Error("Employee not found.")
     }
+    // controlar especialidade do employee e a requerida
+    if (specialty !== employee.specialty) {
+        throw new Error("Specialty doesn't fit")
+    }
     // find Project pelo id
     const project = await findProject({ _id: new ObjectId(String(projectId)) });
-
     if (!project) {
         throw new Error("Project Not Found.");
     }
-
     // Isolar assignment
-    const specialtyAssignment = project.projectNeeds.find(e => e.specialty === specialty);
+    const specialtyAssignment = project.projectNeeds.find((e) => e.specialty === specialty);
     if (!specialtyAssignment) {
         throw new Error("Invalid Specialty.")
     }
@@ -100,4 +103,34 @@ async function assignEmployeeToSlot({ projectId, employeeId, specialty, slotInde
 
     return { success: true, assignedEmployee };
 }
-module.exports = { insertProject, assignEmployeeToSlot }
+
+
+async function removeEmployeeFromAssignment({ projectId, employeeId }) {
+  const project = await findProject({ _id: new ObjectId(String(projectId)) });
+  if (!project) {
+    throw new Error("Project not found.");
+  }
+
+  let updated = false;
+
+  for (const specialtyAssignment of project.projectNeeds) {
+    const index = specialtyAssignment.assigned.findIndex(id => String(id) === String(employeeId));
+
+    if (index !== -1) {
+      specialtyAssignment.assigned[index] = null;
+      updated = true;
+      // remove só uma vez
+      break; 
+    }
+  }
+
+  if (!updated) throw new Error("Funcionário não está atribuído.");
+
+  const result = await updateProject(
+    { _id: new ObjectId((String(projectId))) },
+    { projectNeeds: project.projectNeeds }
+  );
+
+  return { success: true, result };
+}
+module.exports = { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment }

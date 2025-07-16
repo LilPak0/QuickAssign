@@ -1,6 +1,7 @@
 const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
+const validExperiences = ["Junior", "Mid-level", "Senior"];
 
 // inserir employee na DB
 async function insertEmployee (data) {
@@ -28,8 +29,8 @@ async function insertEmployee (data) {
         throw new Error("Projects must be an array");
     }
 
-    // experience deve ser um numero e maior que 0
-    if (typeof experience !== "string" || experience < 0) {
+    // experience deve ser um destes parâmetros
+    if (!validExperiences.includes(experience)) {
         throw new Error("Invalid experience value");
     }
 

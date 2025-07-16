@@ -1,5 +1,5 @@
 const express = require('express');
-const { insertEmployee, filterEmployeesBySpecialty } = require('../services/employees');
+const { insertEmployee, filterEmployees } = require('../services/employees');
 const { findAllEmployees } = require('../data/employees');
 const router = express.Router();
 
