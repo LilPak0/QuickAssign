@@ -1,6 +1,6 @@
 import { FiX } from 'react-icons/fi';
 
-const MemberPopup = ({ member, onClose, roleColors }) => {
+export const MemberPopup = ({ member, onClose, roleColors }) => {
   if (!member) return null;
 
   return (
@@ -65,4 +65,3 @@ const MemberPopup = ({ member, onClose, roleColors }) => {
   );
 };
 
-export default MemberPopup;
