@@ -2,19 +2,152 @@ import { useState } from 'react';
 import { FiFilter, FiPlus } from 'react-icons/fi';
 import { ProjectPopup } from '../components/Project_popup';
 import { ProjectCard } from '../components/Project_Card';
+import { MemberPopup } from '../components/Member_Popup';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core';
+
+// Draggable Member Component
+function DraggableMember({ member, onMemberClick }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: member.id.toString(),
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
+  const handleClick = (e) => {
+    // Only trigger click if not currently dragging
+    if (!isDragging) {
+      onMemberClick(member);
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      onClick={handleClick}
+      className={`p-3 mb-2 rounded-lg cursor-pointer hover:shadow-md transition-transform ${
+        member.role === 'backend' ? 'bg-orange-100 border-orange-200' :
+        member.role === 'frontend' ? 'bg-blue-100 border-blue-200' :
+        'bg-purple-100 border-purple-200'
+      } border ${isDragging ? 'opacity-0' : ''}`}
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
+          member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
+          'bg-purple-200 text-purple-800'
+        } font-medium`}>
+          {member.name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-medium">{member.name}</p>
+          <div className="flex gap-2 mt-1">
+            <span className={`text-xs px-2 py-1 rounded-full capitalize ${
+              member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
+              member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
+              'bg-purple-200 text-purple-800'
+            }`}>
+              {member.role}
+            </span>
+            <span className={`text-xs px-2 py-1 rounded-full ${
+              member.experience === 'Senior' ? 'bg-green-100 text-green-700' :
+              member.experience === 'Mid-Level' ? 'bg-yellow-100 text-yellow-700' :
+              'bg-blue-100 text-blue-700'
+            }`}>
+              {member.experience}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Drag Preview Component
+function DragPreview({ member }) {
+  return (
+    <div className={`p-3 rounded-lg shadow-lg border-2 ${
+      member.role === 'backend' ? 'bg-orange-100 border-orange-300' :
+      member.role === 'frontend' ? 'bg-blue-100 border-blue-300' :
+      'bg-purple-100 border-purple-300'
+    } opacity-90 pointer-events-none`}>
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
+          member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
+          'bg-purple-200 text-purple-800'
+        } font-medium`}>
+          {member.name.charAt(0)}
+        </div>
+        <div>
+          <p className="font-medium text-sm">{member.name}</p>
+          <span className={`text-xs px-2 py-1 rounded-full capitalize ${
+            member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
+            member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
+            'bg-purple-200 text-purple-800'
+          }`}>
+            {member.role}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DashBoard() {
   const [showFilters, setShowFilters] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); 
-    const [projects, setProjects] = useState([]); // Store created projects
-
-  
-  // Mock team data
-  const teamMembers = [
-    { id: 1, name: "Alex Chen", role: "backend", experience: "Senior", skills: ["Node.js", "Python"] },
-    { id: 2, name: "Sarah Park", role: "frontend", experience: "Mid-Level", skills: ["React", "TypeScript"] },
-    { id: 3, name: "Jamie Smith", role: "design", experience: "Junior", skills: ["Figma", "UI/UX"] }
-  ];
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [draggedMember, setDraggedMember] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [teamMembers] = useState([
+    { 
+      id: 1, 
+      name: "Alex Chen", 
+      role: "backend", 
+      experience: "Senior", 
+      skills: ["Node.js", "Python"],
+      email: "alex.chen@example.com",
+      phone: "+1 (555) 123-4567"
+    },
+    { 
+      id: 2, 
+      name: "Sarah Park", 
+      role: "frontend", 
+      experience: "Mid-Level", 
+      skills: ["React", "TypeScript"],
+      email: "sarah.park@example.com",
+      phone: "+1 (555) 987-6543"
+    },
+    { 
+      id: 3, 
+      name: "Jamie Smith", 
+      role: "design", 
+      experience: "Junior", 
+      skills: ["Figma", "UI/UX"],
+      email: "jamie.smith@example.com",
+      phone: "+1 (555) 456-7890"
+    }
+  ]);
 
   // Role colors
   const roleColors = {
@@ -23,135 +156,205 @@ export default function DashBoard() {
     design: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' }
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 80,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor)
+  );
+
   const handleSubmitProject = (projectData) => {
     setProjects([...projects, {
       ...projectData,
-      id: Date.now(), // Simple unique ID
-      createdAt: new Date().toISOString()
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      assignedMembers: {} // Track assigned members by role
     }]);
     setIsPopupOpen(false);
   };
 
-  return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Left Sidebar */}
-      <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col">
-        {/* Header with filter button */}
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">Team Members</h2>
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            className="p-2 text-gray-500 hover:text-blue-600"
-          >
-            <FiFilter size={20} />
-          </button>
-        </div>
+  const handleMemberClick = (member) => {
+    setSelectedMember(member);
+  };
 
-        {/* Filter Dropdown */}
-        {showFilters && (
-          <div className="p-4 border-b border-gray-200 space-y-3">
-            <div>
-              <h3 className="text-sm font-medium mb-1">Experience</h3>
-              <select className="w-full p-2 border rounded text-sm">
-                <option>All Levels</option>
-                <option>Beginner</option>
-                <option>Mid-Level</option>
-                <option>Senior</option>
-              </select>
-            </div>
+  const handleCloseMemberPopup = () => {
+    setSelectedMember(null);
+  };
 
-            <div>
-              <h3 className="text-sm font-medium mb-1">Role</h3>
-              <div className="space-y-1">
-                {Object.keys(roleColors).map(role => (
-                  <label key={role} className="flex items-center gap-2">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm capitalize">{role}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+  function handleDragStart(event) {
+    const { active } = event;
+    const member = teamMembers.find(m => m.id.toString() === active.id);
+    setDraggedMember(member);
+  }
 
-        {/* Member List */}
-        <div className="flex-1 overflow-y-auto p-2">
-          {teamMembers.map(member => (
-            <div 
-              key={member.id}
-              className={`p-3 mb-2 rounded-lg cursor-pointer hover:shadow-md transition-shadow ${
-                roleColors[member.role].bg
-              } ${roleColors[member.role].border} border`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  roleColors[member.role].text
-                } font-medium`}>
-                  {member.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-medium">{member.name}</p>
-                  <div className="flex gap-2 mt-1">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      roleColors[member.role].bg
-                    } ${roleColors[member.role].text}`}>
-                      {member.role}
-                    </span>
-                    <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
-                      {member.experience}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    setDraggedMember(null);
 
-       {/* Main Content Area */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">My Projects</h1>
+    if (!over) return;
+
+    const memberId = parseInt(active.id);
+    const [projectId, role] = over.id.split('-');
+    
+    if (projectId && role) {
+      handleDropMember(parseInt(projectId), memberId, role);
+    }
+  }
+
+  const handleDropMember = (projectId, memberId, role) => {
+    setProjects(projects.map(project => {
+      if (project.id === projectId) {
+        const currentAssigned = project.assignedMembers?.[role] || [];
+        const requiredCount = project.requirements[role];
         
-        {/* Projects Grid */}
-        {projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map(project => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-            <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <FiPlus className="text-gray-400" size={40} />
-            </div>
-            <h3 className="text-xl font-medium text-gray-700 mb-2">No projects yet</h3>
-            <p className="text-gray-500 mb-6">Create your first project to get started</p>
-            <button
-              onClick={() => setIsPopupOpen(true)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        // Only allow adding if not already assigned AND if under the requirement limit
+        if (!currentAssigned.includes(memberId) && currentAssigned.length < requiredCount) {
+          return {
+            ...project,
+            assignedMembers: {
+              ...project.assignedMembers,
+              [role]: [...currentAssigned, memberId]
+            }
+          };
+        }
+      }
+      return project;
+    }));
+  };
+
+  const handleRemoveMember = (projectId, memberId, role) => {
+    setProjects(projects.map(project => {
+      if (project.id === projectId) {
+        const currentAssigned = project.assignedMembers?.[role] || [];
+        return {
+          ...project,
+          assignedMembers: {
+            ...project.assignedMembers,
+            [role]: currentAssigned.filter(id => id !== memberId)
+          }
+        };
+      }
+      return project;
+    }));
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex h-screen bg-gray-50">
+        {/* Left Sidebar - Team Members */}
+        <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col">
+          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-800">Team Members</h2>
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="p-2 text-gray-500 hover:text-blue-600"
             >
-              Create Project
+              <FiFilter size={20} />
             </button>
           </div>
-        )}
 
-        {/* Floating Action Button */}
-        {projects.length > 0 && (
-          <button
-            onClick={() => setIsPopupOpen(true)}
-            className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-white transition-transform hover:scale-105"
-          >
-            <FiPlus size={24} />
-          </button>
-        )}
+          {/* Filter Dropdown */}
+          {showFilters && (
+            <div className="p-4 border-b border-gray-200 space-y-3">
+              <div>
+                <h3 className="text-sm font-medium mb-1">Experience</h3>
+                <select className="w-full p-2 border rounded text-sm">
+                  <option>All Levels</option>
+                  <option>Beginner</option>
+                  <option>Mid-Level</option>
+                  <option>Senior</option>
+                </select>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium mb-1">Role</h3>
+                <div className="space-y-1">
+                  {Object.keys(roleColors).map(role => (
+                    <label key={role} className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      <span className="text-sm capitalize">{role}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto p-2">
+            {teamMembers.map(member => (
+              <DraggableMember 
+                key={member.id} 
+                member={member} 
+                onMemberClick={handleMemberClick}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">My Projects</h1>
+          
+          {projects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {projects.map(project => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onDropMember={handleDropMember}
+                  onRemoveMember={handleRemoveMember}
+                  teamMembers={teamMembers}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center py-12">
+              <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <FiPlus className="text-gray-400" size={40} />
+              </div>
+              <h3 className="text-xl font-medium text-gray-700 mb-2">No projects yet</h3>
+              <p className="text-gray-500 mb-6">Create your first project to get started</p>
+              <button
+                onClick={() => setIsPopupOpen(true)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Create Project
+              </button>
+            </div>
+          )}        {/* Floating Action Button */}
+        <button
+          onClick={() => setIsPopupOpen(true)}
+          className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-white transition-transform hover:scale-105"
+        >
+          <FiPlus size={24} />
+        </button>
       </div>
 
-      {/* Project Popup Component */}
       <ProjectPopup 
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         onSubmit={handleSubmitProject}
       />
+
+      {/* Member Popup Component */}
+      <MemberPopup 
+        member={selectedMember}
+        onClose={handleCloseMemberPopup}
+        roleColors={roleColors}
+      />
+
+      <DragOverlay>
+        {draggedMember ? <DragPreview member={draggedMember} /> : null}
+      </DragOverlay>
     </div>
+    </DndContext>
   );
 }
