@@ -1,6 +1,7 @@
-const { createEmployee, findEmployee, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
+const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
+const validExperiences = ["Junior", "Mid-level", "Senior"];
 
 // inserir employee na DB
 async function insertEmployee (data) {
@@ -28,8 +29,8 @@ async function insertEmployee (data) {
         throw new Error("Projects must be an array");
     }
 
-    // experience deve ser um numero e maior que 0
-    if (typeof experience !== "string" || experience < 0) {
+    // experience deve ser um destes parâmetros
+    if (!validExperiences.includes(experience)) {
         throw new Error("Invalid experience value");
     }
 
@@ -40,23 +41,29 @@ async function insertEmployee (data) {
 }
 
 
-// filtrar funcionários por especialidade
-async function filterEmployeesBySpecialty (specialty) {
-    if(!specialty) {
-        throw new Error ("Invalid Specialty")
+
+// filtrar por especialidade e experiencia (opcional)
+async function filterEmployees({ specialty, experience }) {
+    const filters = {};
+
+    if (specialty) {
+        filters.specialty = specialty;
     }
-    const result = await findEmployeesBySpecialty(specialty)
-    return result
+
+    if (experience !== undefined) {
+        filters.experience = experience;
+    } 
+
+  // Se nenhum filtro for passado, retornar todos
+  const result = Object.keys(filters).length === 0
+    ? await findAllEmployees()
+    : await findEmployees(filters);
+
+  return result;
 }
 
-// filtrar funcionários por especialidade
-async function filterEmployeesByExperience (experience) {
-    if(!experience) {
-        throw new Error ("Invalid Experience")
-    }
-    const result = await findEmployeesByExperience(specialty)
-    return result
-}
 
 
-module.exports = { insertEmployee, filterEmployeesBySpecialty, filterEmployeesByExperience }
+
+
+module.exports = { insertEmployee, filterEmployees }

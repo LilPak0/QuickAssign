@@ -1,6 +1,6 @@
 // CRUD - CREATE, READ, UPDATE, DELETE
 
-const {getCollection, getConnection, closeConnection} = require("mongodb")
+const {getCollection, getConnection, closeConnection} = require("../config/mongodb")
 
 // Create Projects
 async function createProject (data) {
@@ -15,6 +15,14 @@ async function findProject (data) {
     const result = await collection.findOne(data)
     return result
 }
+
+// Read All Projects
+async function findAllProjects () {
+    const collection = await getCollection("projects");
+    const result = await collection.find().toArray()
+    return result
+}
+
 
 // Read projects by Status
 async function findProjectsByStatus (status) {
@@ -36,4 +44,4 @@ async function deleteProject (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createProject, findProject, findProjectsByStatus, updateProject, deleteProject }
+module.exports = { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject }

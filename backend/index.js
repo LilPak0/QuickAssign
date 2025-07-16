@@ -10,9 +10,11 @@ app.use(express.json())
 const cors = require('cors')
 app.use(cors());
 
-const employeeRoutes = require('./routes/employees.route')
+const employeeRoutes = require('./routes/employees.route');
+const projectsRoutes = require('./routes/projects.route');
 
 app.use('/api/employees', employeeRoutes);
+app.use('/api/projects', projectsRoutes)
 
 module.exports = app;
 
