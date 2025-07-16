@@ -1,4 +1,4 @@
-const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee, findEmployeesByProperty, findEmployees } = require('../data/employees')
+const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee, findEmployeesByProperty } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
 

@@ -1,3 +1,4 @@
+"use client"
 import { FiMoreHorizontal, FiUsers, FiTrash2, FiCalendar, FiCheckSquare, FiPlay, FiClock, FiCheckCircle } from 'react-icons/fi';
 import { useDroppable } from '@dnd-kit/core';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +58,7 @@ function DroppableZone({ id, children, role, project, teamMembers, className }) 
   );
 }
 
-export function Ongoing({ project, onDropMember, teamMembers, onRemoveMember }) {
+export default function Ongoing({ project, onDropMember, teamMembers, onRemoveMember }) {
   const navigate = useNavigate();
 
   // Helper functions

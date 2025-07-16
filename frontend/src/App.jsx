@@ -8,7 +8,7 @@ function App() {
    <BrowserRouter>
       <Routes>
         <Route path="/" element={<DashBoard />} />
-        <Route path="/ongoing" element={<Ongoing />} />
+        <Route path="/ongoing" element={<Ongoing></Ongoing>} />
         {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>
