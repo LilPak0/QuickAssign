@@ -29,6 +29,12 @@ async function findEmployeesByExperience (experience) {
     return result
 }
 
+async function findAllEmployees() {
+    const collection = await getCollection("employees");
+    const result = await collection.find().toArray()
+    return result
+}
+
 // Update Employee
 async function updateEmployee (filter, update) {
     const collection = await getCollection("employees");
@@ -42,5 +48,5 @@ async function deleteEmployee (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesBySpecialty, findEmployeesByExperience }
+module.exports = { createEmployee, findEmployee, findAllEmployees, updateEmployee, deleteEmployee, findEmployeesBySpecialty, findEmployeesByExperience }
 
