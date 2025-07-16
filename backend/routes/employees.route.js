@@ -3,7 +3,7 @@ const { insertEmployee, filterEmployeesBySpecialty } = require('../services/empl
 const { findAllEmployees } = require('../data/employees');
 const router = express.Router();
 
-//  POST criação de um employee
+// POST criação de um employee
 router.post('/create', async (req, res) => {
     try {
         const data = req.body
@@ -15,6 +15,7 @@ router.post('/create', async (req, res) => {
     }
 })
 
+// GET all employees
 router.get('/allemployees', async (req, res) => {
     try {
         const result = await findAllEmployees()
@@ -24,17 +25,17 @@ router.get('/allemployees', async (req, res) => {
     }
 })
 
-// GET filtrar employees por especialidade
-router.get('/filters', async (req, res) => {
-    try {
-        const { specialty } = req.body
-        console.log (specialty)
-        const result = await filterEmployeesBySpecialty(specialty)
-        console.log(result)
-        res.status(200).json(result)
-    } catch (err) {
-        res.status(400).json({ message: err.message })
-    }
-})
+// GET filtrar employees por especialidade e experiencia
+router.post('/filters', async (req, res) => {
+  try {
+    // Usa direto o body como input
+    const result = await filterEmployees(req.body); 
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 
 module.exports = router;

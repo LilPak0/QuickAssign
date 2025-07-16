@@ -10,7 +10,7 @@ async function createEmployee (data) {
 }
 
 // Read Employee
-async function findEmployee (data) {
+async function readEmployee (data) {
     const collection = await getCollection("employees");
     const result = await collection.findOne(data)
     return result
@@ -22,6 +22,13 @@ async function findEmployeesBySpecialty (specialty) {
     const result = await collection.find({ specialty: specialty}).toArray()
     return result
 }
+
+// Filter Employees
+async function findEmployees(filters) {
+  const collection = await getCollection("employees");
+  return await collection.find(filters).toArray();
+}
+
 
 async function findEmployeesByExperience (experience) {
     const collection = await getCollection("employees");
@@ -48,5 +55,5 @@ async function deleteEmployee (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createEmployee, findEmployee, findAllEmployees, updateEmployee, deleteEmployee, findEmployeesBySpecialty, findEmployeesByExperience }
+module.exports = { createEmployee, readEmployee, findAllEmployees, findEmployees, updateEmployee, deleteEmployee, findEmployeesBySpecialty, findEmployeesByExperience }
 

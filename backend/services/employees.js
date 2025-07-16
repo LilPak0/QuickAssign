@@ -1,4 +1,4 @@
-const { createEmployee, findEmployee, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee } = require('../data/employees')
+const { createEmployee, readEmployee, findEmployees, findAllEmployees, findEmployeesBySpecialty, findEmployeesByExperience, updateEmployee, deleteEmployee, findEmployeesByProperty, findEmployees } = require('../data/employees')
 
 const specialties = [ "Frontend Developer", "Backend Developer", "Designer UX/UI", "DevOps Engineer", "Data Analyst", "Business Analyst", "QA Engineer/Tester" ]
 
@@ -41,22 +41,36 @@ async function insertEmployee (data) {
 
 
 // filtrar funcionários por especialidade
-async function filterEmployeesBySpecialty (specialty) {
-    if(!specialty) {
+async function filterEmployeesByProperty (property) {
+    if(!property) {
         throw new Error ("Invalid Specialty")
     }
-    const result = await findEmployeesBySpecialty(specialty)
+    const result = await findEmployeesByProperty(property)
     return result
 }
 
-// filtrar funcionários por especialidade
-async function filterEmployeesByExperience (experience) {
-    if(!experience) {
-        throw new Error ("Invalid Experience")
+
+
+// filtrar por especialidade e experiencia (opcional)
+async function filterEmployees({ specialty, experience }) {
+    const filters = {};
+
+    if (specialty) {
+        filters.specialty = specialty;
     }
-    const result = await findEmployeesByExperience(specialty)
-    return result
+
+    if (experience !== undefined) {
+        filters.experience = experience;
+    } 
+
+  // Se nenhum filtro for passado, retornar todos
+  const result = Object.keys(filters).length === 0
+    ? await findAllEmployees()
+    : await findEmployees(filters);
+
+  return result;
 }
 
 
-module.exports = { insertEmployee, filterEmployeesBySpecialty, filterEmployeesByExperience }
+
+module.exports = { insertEmployee, filterEmployeesByProperty, filterEmployees }
