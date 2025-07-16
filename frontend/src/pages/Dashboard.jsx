@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { FiFilter, FiPlus, FiHome, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
 import { ProjectPopup } from '../components/Project_popup';
 import { ProjectCard } from '../components/Project_Card';
 import { MemberPopup } from '../components/Member_Popup';
@@ -86,7 +86,7 @@ function DraggableMember({ member, onMemberClick }) {
     transform,
     isDragging,
   } = useDraggable({
-    id: member.id.toString(),
+    id: member?.id?.toString() || 'unknown',
   });
 
   const style = transform ? {
@@ -94,10 +94,16 @@ function DraggableMember({ member, onMemberClick }) {
   } : undefined;
 
   const handleClick = (e) => {
-    if (!isDragging) {
+    // Only trigger click if not currently dragging
+    if (!isDragging && member) {
       onMemberClick(member);
     }
   };
+
+  // Safety check for member data
+  if (!member || !member.name) {
+    return null;
+  }
 
   return (
     <div
@@ -187,38 +193,48 @@ export default function DashBoard() {
   const [projects, setProjects] = useState([]);
   const [draggedMember, setDraggedMember] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  
+  // Fetch employees from backend
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3033/api/employees/allemployees');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch employees');
+        }
+        
+        const employees = await response.json();
+        
+        // Transform backend data to match frontend format
+        const transformedEmployees = employees.map(emp => ({
+          id: emp._id, // MongoDB uses _id
+          name: `${emp.firstName} ${emp.lastName}`, // Combine first and last name
+          role: emp.specialty, // Backend uses 'specialty', frontend expects 'role'
+          experience: emp.experience,
+          skills: emp.skills,
+          email: emp.email,
+          phone: emp.phone || "Not provided" // Default if phone is missing
+        }));
+        
+        setTeamMembers(transformedEmployees);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching employees:', err);
+        setError(err.message);
+        // Fallback to empty array on error
+        setTeamMembers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const [teamMembers] = useState([
-    { 
-      id: 1, 
-      name: "Alex Chen", 
-      role: "Backend Developer", 
-      experience: "Senior", 
-      skills: ["Node.js", "Python"],
-      email: "alex.chen@example.com",
-      phone: "+1 (555) 123-4567"
-    },
-    { 
-      id: 2, 
-      name: "Sarah Park", 
-      role: "Frontend Developer", 
-      experience: "Mid-Level", 
-      skills: ["React", "TypeScript"],
-      email: "sarah.park@example.com",
-      phone: "+1 (555) 987-6543"
-    },
-    { 
-      id: 3, 
-      name: "Jamie Smith", 
-      role: "Designer UX/UI", 
-      experience: "Junior", 
-      skills: ["Figma", "UI/UX"],
-      email: "jamie.smith@example.com",
-      phone: "+1 (555) 456-7890"
-    }
-  ]);
+    fetchEmployees();
+  }, []);
 
   // Role colors
   const roleColors = {
@@ -363,14 +379,27 @@ export default function DashBoard() {
               </div>
             )}
 
-            <div className="flex-1 overflow-y-auto p-2">
-              {teamMembers.map(member => (
+          <div className="flex-1 overflow-y-auto p-2">
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="text-gray-500">Loading team members...</div>
+              </div>
+            ) : error ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="text-red-500">Error: {error}</div>
+              </div>
+            ) : teamMembers.length === 0 ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="text-gray-500">No team members found</div>
+              </div>
+            ) : (
+              teamMembers.map(member => (
                 <DraggableMember 
                   key={member.id} 
                   member={member} 
                   onMemberClick={handleMemberClick}
                 />
-              ))}
+              )))}
             </div>
           </div>
 
