@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { Routes, Route, useNavigate, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import DashBoard from './pages/Dashboard';
 
 function App() {
