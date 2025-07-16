@@ -1,6 +1,6 @@
 // CRUD - CREATE, READ, UPDATE, DELETE
 
-const {getCollection, getConnection, closeConnection} = require("./mongodb")
+const {getCollection, getConnection, closeConnection} = require("../config/mongodb")
 
 // Create Employee
 async function createEmployee (data) {
@@ -17,9 +17,9 @@ async function findEmployee (data) {
 }
 
 // Read Employees by Especialty
-async function findEmployeesByEspecialty (especialty) {
+async function findEmployeesBySpecialty (specialty) {
     const collection = await getCollection("employee");
-    const result = await collection.find({ especialty: especialty}).toArray()
+    const result = await collection.find({ speciality: specialty}).toArray()
     return result
 }
 
@@ -36,7 +36,7 @@ async function deleteEmployee (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesByEspecialty }
+module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesBySpecialty }
 
 /*
 // Count users checked-in

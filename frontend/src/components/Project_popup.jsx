@@ -32,11 +32,12 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
         <form onSubmit={(e) => {
           e.preventDefault();
           onSubmit(project);
-          project.name = '';
-            project.client = '';
-          project.description = '';
-            project.requirements = { backend: 1, frontend: 1, design: 1 };
-
+          setProject({
+            name: '',
+            description: '',
+            client: '',
+            requirements: { backend: 1, frontend: 1, design: 1 }
+          });
         }}>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
