@@ -12,9 +12,11 @@ app.use(cors());
 
 const employeeRoutes = require('./routes/employees.route');
 const projectsRoutes = require('./routes/projects.route');
+const authRoutes = require('./routes/auth.route')
 
 app.use('/api/employees', employeeRoutes);
 app.use('/api/projects', projectsRoutes)
+app.use('/api/auth', authRoutes)
 
 module.exports = app;
 

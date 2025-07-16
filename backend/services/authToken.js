@@ -1,4 +1,4 @@
-const {  } = require('../data/user');
+const { findAdmin } = require('../data/admin');
 const { ObjectId } = require('mongodb');
 
 // Criação de array de tokens de sessão
@@ -19,13 +19,13 @@ async function authenticateToken (token) {
     }
     const id = new ObjectId(String(token))
     // Procurar o utilizador com base no token (que é o _id)
-    const user = await findUser({ _id: id });
+    const admin = await findAdmin({ _id: id });
     // Se não encontrar utilizador com o respetivo Token
-    if (!user) {
-        throw new Error("User not found.");
+    if (!admin) {
+        throw new Error("Admin not found.");
     }
 
-    return user
+    return admin;
 }
 
 // Adicionar tokens ao array de sessão
