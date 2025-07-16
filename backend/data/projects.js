@@ -16,6 +16,14 @@ async function findProject (data) {
     return result
 }
 
+// Read All Projects
+async function findAllProjects () {
+    const collection = await getCollection("projects");
+    const result = await collection.find().toArray()
+    return result
+}
+
+
 // Read projects by Status
 async function findProjectsByStatus (status) {
     const collection = await getCollection("projects");
@@ -36,4 +44,4 @@ async function deleteProject (data) {
     await collection.deleteOne(data)
 }
 
-module.exports = { createProject, findProject, findProjectsByStatus, updateProject, deleteProject }
+module.exports = { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject }
