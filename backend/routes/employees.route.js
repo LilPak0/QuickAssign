@@ -17,8 +17,10 @@ router.post('/create', async (req, res) => {
 // GET filtrar employees por especialidade
 router.get('/filters', async (req, res) => {
     try {
-        const { specialty } = req.query
+        const { specialty } = req.body
+        console.log (specialty)
         const result = await filterEmployeesBySpecialty(specialty)
+        console.log(result)
         res.status(200).json(result)
     } catch (err) {
         res.status(400).json({ message: err.message })
