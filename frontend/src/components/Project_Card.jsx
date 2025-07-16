@@ -178,3 +178,4 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
     </div>
   );
 }
+
