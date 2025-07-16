@@ -6,7 +6,7 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
   const [project, setProject] = useState({
     name: '',
     description: '',
-    requirements: { backend: 1, frontend: 1, design: 1 }
+    requirements: { 'Backend Developer': 1, "Frontend Developer": 1, "Designer UX/UI": 1, "DevOps Engineer": 1, "Data Analyst": 1, "Business Analyst": 1, "QA Engineer/Tester": 1 }
   });
 
   const handleChange = (e) => {
@@ -36,7 +36,7 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
             name: '',
             description: '',
             client: '',
-            requirements: { backend: 1, frontend: 1, design: 1 }
+            requirements: { 'Backend Developer': 1, "Frontend Developer": 1, "Designer UX/UI": 1, "DevOps Engineer": 1, "Data Analyst": 1, "Business Analyst": 1, "QA Engineer/Tester": 1 }
           });
         }}>
           <div className="p-6">
