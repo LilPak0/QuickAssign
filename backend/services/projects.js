@@ -1,5 +1,6 @@
 const { ObjectId } = require('bson');
-const { createProject, findProject, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects')
+const { createProject, findProject, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
+const { readEmployee } = require('../data/employees');
 
 /* {
   _id: ObjectId("..."),
@@ -56,6 +57,11 @@ async function insertProject (data) {
 
 
 async function assignEmployeeToSlot({ projectId, employeeId, specialty, slotIndex }) {
+    // find employee
+    const employee = await readEmployee({ _id: new ObjectId(String(employeeId))});
+    if (!employee) {
+        throw new Error("Employee not found.")
+    }
     // find Project pelo id
     const project = await findProject({ _id: new ObjectId(String(projectId)) });
 

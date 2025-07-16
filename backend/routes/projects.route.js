@@ -1,5 +1,5 @@
 const express = require('express');
-const { insertProject } = require('../services/projects');
+const { insertProject, assignEmployeeToSlot } = require('../services/projects');
 const { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const router = express.Router();
 
@@ -44,6 +44,18 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(200).json(result)
     } catch (err) {
         res.status(500).json({ error: err.message })
+    }
+})
+
+router.post('/:id/add-slot', async (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const { employeeId, specialty, slotIndex } = req.body
+
+        const addSlot = await assignEmployeeToSlot({projectId, employeeId, specialty, slotIndex})
+        return res.status(200).json(addSlot)
+    } catch (err) {
+        return res.status(500).json( {error: err.message })
     }
 })
 
