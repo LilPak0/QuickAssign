@@ -140,7 +140,7 @@ async function checkAndStartProject(projectId) {
   const currentDate = new Date().toISOString().split('T')[0]; 
 
   // Atualiza o status
-  const updated = await updateProject(project._id, { status: "Ongoing", projectStart: currentDate });
+  const updated = await updateProject({ _id: project._id }, { status: "Ongoing", projectStart: currentDate });
 
   return updated;
 }
@@ -160,7 +160,7 @@ async function finishProject(projectId) {
 
   const finishDate = new Date().toISOString().split('T')[0];
 
-  const updated = await updateProject(project._id, {
+  const updated = await updateProject({ _id: project._id }, {
     status: "Completed",
     projectEnd: finishDate
   });

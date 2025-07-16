@@ -1,4 +1,5 @@
 const express = require('express');
+const { ObjectId } = require('mongodb')
 const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment, checkAndStartProject, finishProject } = require('../services/projects');
 const { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const router = express.Router();
@@ -76,9 +77,9 @@ router.post('/:id/unassign-slot', async (req, res) => {
 });
 
 // POST start project
-app.post('/:id/start', async (req, res) => {
+router.post('/:id/start', async (req, res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const result = await checkAndStartProject(id);
         res.status(200).json({ message: "Project in progress", data: result})
     } catch (err) {
@@ -87,7 +88,7 @@ app.post('/:id/start', async (req, res) => {
 })
 
 // POST finish match
-app.post('/:id/finish', async (req, res) => {
+router.post('/:id/finish', async (req, res) => {
     try {
         const { id } = req.params;
         const result = await finishProject(id);
