@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { FiFilter, FiPlus } from 'react-icons/fi';
+import { ProjectPopup } from '../components/Project_popup';
 
 export default function DashBoard() {
   const [showFilters, setShowFilters] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
   
   // Mock team data
   const teamMembers = [
@@ -16,6 +18,12 @@ export default function DashBoard() {
     backend: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
     frontend: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
     design: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' }
+  };
+
+  const handleSubmitProject = (projectData) => {
+    console.log('New project created:', projectData);
+    // Here you would typically send the data to your backend
+    setIsPopupOpen(false); // Close the popup after submission
   };
 
   return (
@@ -98,12 +106,18 @@ export default function DashBoard() {
       <div className="flex-1 relative">
         {/* Add Project Button */}
         <button
-          onClick={() => console.log('Add project clicked')}
+          onClick={() => setIsPopupOpen(true)}
           className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 flex items-center justify-center text-white transition-transform hover:scale-105"
         >
           <FiPlus size={24} />
         </button>
       </div>
+      {/* Project Popup Component */}
+      <ProjectPopup 
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        onSubmit={handleSubmitProject}
+      />
     </div>
   );
 }
