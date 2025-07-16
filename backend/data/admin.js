@@ -1,6 +1,6 @@
 // PENSAR EM CRUD - CREATE, READ, UPDATE, DELETE
 
-const {getCollection, getConnection, closeConnection} = require("./mongodb")
+const {getCollection, getConnection, closeConnection} = require("../config/mongodb")
 
 // Create Admin
 async function insertAdmin (data) {
