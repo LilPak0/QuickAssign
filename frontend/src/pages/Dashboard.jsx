@@ -107,16 +107,18 @@ function DraggableMember({ member, onMemberClick }) {
       {...attributes}
       onClick={handleClick}
       className={`p-3 mb-2 rounded-lg cursor-pointer hover:shadow-md transition-transform ${
-        member.role === 'backend' ? 'bg-orange-100 border-orange-200' :
-        member.role === 'frontend' ? 'bg-blue-100 border-blue-200' :
-        'bg-purple-100 border-purple-200'
+        member.role === 'Backend Developer' ? 'bg-orange-100 border-orange-200' :
+        member.role === 'Frontend Developer' ? 'bg-blue-100 border-blue-200' :
+        member.role === 'Designer UX/UI' ? 'bg-purple-100 border-purple-200' :
+        'bg-gray-100 border-gray-200'
       } border ${isDragging ? 'opacity-0' : ''}`}
     >
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
-          member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
-          'bg-purple-200 text-purple-800'
+          member.role === 'Backend Developer' ? 'bg-orange-200 text-orange-800' :
+          member.role === 'Frontend Developer' ? 'bg-blue-200 text-blue-800' :
+          member.role === 'Designer UX/UI' ? 'bg-purple-200 text-purple-800' :
+          'bg-gray-200 text-gray-800'
         } font-medium`}>
           {member.name.charAt(0)}
         </div>
@@ -124,9 +126,10 @@ function DraggableMember({ member, onMemberClick }) {
           <p className="font-medium">{member.name}</p>
           <div className="flex gap-2 mt-1">
             <span className={`text-xs px-2 py-1 rounded-full capitalize ${
-              member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
-              member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
-              'bg-purple-200 text-purple-800'
+              member.role === 'Backend Developer' ? 'bg-orange-200 text-orange-800' :
+              member.role === 'Frontend Developer' ? 'bg-blue-200 text-blue-800' :
+              member.role === 'Designer UX/UI' ? 'bg-purple-200 text-purple-800' :
+              'bg-gray-200 text-gray-800'
             }`}>
               {member.role}
             </span>
@@ -148,24 +151,27 @@ function DraggableMember({ member, onMemberClick }) {
 function DragPreview({ member }) {
   return (
     <div className={`p-3 rounded-lg shadow-lg border-2 ${
-      member.role === 'backend' ? 'bg-orange-100 border-orange-300' :
-      member.role === 'frontend' ? 'bg-blue-100 border-blue-300' :
-      'bg-purple-100 border-purple-300'
+      member.role === 'Backend Developer' ? 'bg-orange-100 border-orange-300' :
+      member.role === 'Frontend Developer' ? 'bg-blue-100 border-blue-300' :
+      member.role === 'Designer UX/UI' ? 'bg-purple-100 border-purple-300' :
+      'bg-gray-100 border-gray-300'
     } opacity-90 pointer-events-none`}>
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
-          member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
-          'bg-purple-200 text-purple-800'
+          member.role === 'Backend Developer' ? 'bg-orange-200 text-orange-800' :
+          member.role === 'Frontend Developer' ? 'bg-blue-200 text-blue-800' :
+          member.role === 'Designer UX/UI' ? 'bg-purple-200 text-purple-800' :
+          'bg-gray-200 text-gray-800'
         } font-medium`}>
           {member.name.charAt(0)}
         </div>
         <div>
           <p className="font-medium text-sm">{member.name}</p>
           <span className={`text-xs px-2 py-1 rounded-full capitalize ${
-            member.role === 'backend' ? 'bg-orange-200 text-orange-800' :
-            member.role === 'frontend' ? 'bg-blue-200 text-blue-800' :
-            'bg-purple-200 text-purple-800'
+            member.role === 'Backend Developer' ? 'bg-orange-200 text-orange-800' :
+            member.role === 'Frontend Developer' ? 'bg-blue-200 text-blue-800' :
+            member.role === 'Designer UX/UI' ? 'bg-purple-200 text-purple-800' :
+            'bg-gray-200 text-gray-800'
           }`}>
             {member.role}
           </span>
@@ -181,11 +187,14 @@ export default function DashBoard() {
   const [projects, setProjects] = useState([]);
   const [draggedMember, setDraggedMember] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
+
+  
+
   const [teamMembers] = useState([
     { 
       id: 1, 
       name: "Alex Chen", 
-      role: "backend", 
+      role: "Backend Developer", 
       experience: "Senior", 
       skills: ["Node.js", "Python"],
       email: "alex.chen@example.com",
@@ -194,7 +203,7 @@ export default function DashBoard() {
     { 
       id: 2, 
       name: "Sarah Park", 
-      role: "frontend", 
+      role: "Frontend Developer", 
       experience: "Mid-Level", 
       skills: ["React", "TypeScript"],
       email: "sarah.park@example.com",
@@ -203,7 +212,7 @@ export default function DashBoard() {
     { 
       id: 3, 
       name: "Jamie Smith", 
-      role: "design", 
+      role: "Designer UX/UI", 
       experience: "Junior", 
       skills: ["Figma", "UI/UX"],
       email: "jamie.smith@example.com",

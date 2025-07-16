@@ -37,11 +37,3 @@ async function deleteProject (data) {
 }
 
 module.exports = { createProject, findProject, findProjectsByStatus, updateProject, deleteProject }
-
-/*
-// Count users checked-in
-async function countUsersCheckedIn() {
-    const collection = await getCollection("user");
-    const count = await collection.find({ paymentToken: true }).toArray();
-    return count.length;
-} */

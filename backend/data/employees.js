@@ -4,44 +4,49 @@ const {getCollection, getConnection, closeConnection} = require("../config/mongo
 
 // Create Employee
 async function createEmployee (data) {
-    const collection = await getCollection("employee");
+    const collection = await getCollection("employees");
     const create = await collection.insertOne(data)
     return create.insertedId
 }
 
 // Read Employee
 async function findEmployee (data) {
-    const collection = await getCollection("employee");
+    const collection = await getCollection("employees");
     const result = await collection.findOne(data)
     return result
 }
 
 // Read Employees by Especialty
 async function findEmployeesBySpecialty (specialty) {
-    const collection = await getCollection("employee");
-    const result = await collection.find({ speciality: specialty}).toArray()
+    const collection = await getCollection("employees");
+    const result = await collection.find({ specialty: specialty}).toArray()
+    return result
+}
+
+async function findEmployeesByExperience (experience) {
+    const collection = await getCollection("employees");
+    const result = await collection.find({ experience: experience}).toArray()
+    return result
+}
+
+async function findAllEmployees() {
+    const collection = await getCollection("employees");
+    const result = await collection.find().toArray()
     return result
 }
 
 // Update Employee
 async function updateEmployee (filter, update) {
-    const collection = await getCollection("employee");
+    const collection = await getCollection("employees");
     const result = await collection.updateOne(filter, { $set: update })
     return result
 }
 
 // Delete Employee
 async function deleteEmployee (data) {
-    const collection = await getCollection("employee");
+    const collection = await getCollection("employees");
     await collection.deleteOne(data)
 }
 
-module.exports = { createEmployee, findEmployee, updateEmployee, deleteEmployee, findEmployeesBySpecialty }
+module.exports = { createEmployee, findEmployee, findAllEmployees, updateEmployee, deleteEmployee, findEmployeesBySpecialty, findEmployeesByExperience }
 
-/*
-// Count users checked-in
-async function countUsersCheckedIn() {
-    const collection = await getCollection("user");
-    const count = await collection.find({ paymentToken: true }).toArray();
-    return count.length;
-} */
