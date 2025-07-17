@@ -43,7 +43,7 @@ router.get('/filters', async (req, res) => {
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id
-        const result = await deleteProject({ id })
+        const result = await deleteProject({ _id: new ObjectId(String(id)) })
         res.status(200).json(result)
     } catch (err) {
         res.status(500).json({ error: err.message })

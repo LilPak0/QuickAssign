@@ -78,7 +78,7 @@ async function assignEmployeeToSlot({ projectId, employeeId, specialty, slotInde
     }
     // Se slot já estiver ocupado
     if (specialtyAssignment.assigned[slotIndex] !== null) {
-        throw new Error("Este slot já está ocupado.");
+        throw new Error("This slot is occupied");
     }
 
     // Atualizar slot com o employee
