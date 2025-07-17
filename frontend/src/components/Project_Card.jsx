@@ -99,7 +99,7 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow max-w-sm">
       <div className="p-3">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="font-bold text-base text-gray-800">{project.name}</h3>
+          <h3 className="font-bold text-base text-gray-800">{project.title}</h3>
           <div className="flex gap-1">
             <button 
               onClick={() => onCompleteProject(project.id)}
@@ -132,7 +132,7 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
           </div>
           <div className="flex items-center gap-1">
             <FiCalendar size={12} />
-            <span>{formatDate(project.createdAt)}</span>
+            <span>{formatDate(project.projectStart)}</span>
           </div>
           <div className="flex items-center gap-1">
             <FiCheckSquare size={12} />
