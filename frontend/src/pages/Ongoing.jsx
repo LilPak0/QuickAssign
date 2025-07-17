@@ -150,6 +150,7 @@ export default function Ongoing() {
                 teamMembers={teamMembers}
                 onDeleteProject={handleDeleteProject}
                 onCompleteProject={handleFinishProject}
+                allowMemberRemoval={false}
               />
             ))}
           </div>

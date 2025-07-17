@@ -86,6 +86,7 @@ export default function Finish() {
                 key={project.id}
                 project={project}
                 teamMembers={teamMembers}
+                allowMemberRemoval={false}
                 // Do not pass onDeleteProject or onCompleteProject
               />
             ))}
