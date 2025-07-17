@@ -147,6 +147,8 @@ export default function DashBoard() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedExperience, setSelectedExperience] = useState('All Levels');
+  const [selectedRoles, setSelectedRoles] = useState([]);
 
   // Fetch employees from backend
   useEffect(() => {
@@ -186,6 +188,39 @@ export default function DashBoard() {
 
     fetchEmployees();
   }, []);
+
+  // Fetch filtered employees from backend
+  const fetchFilteredEmployees = async (experience, roles) => {
+    try {
+      setLoading(true);
+      const body = {};
+      if (experience && experience !== 'All Levels') body.experience = experience;
+      if (roles && roles.length > 0) body.specialty = roles;
+      const response = await fetch('http://localhost:3033/api/employees/filters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!response.ok) throw new Error('Failed to fetch filtered employees');
+      const employees = await response.json();
+      const transformedEmployees = employees.map(emp => ({
+        id: emp._id,
+        name: `${emp.firstName} ${emp.lastName}`,
+        role: emp.specialty,
+        experience: emp.experience,
+        skills: emp.skills,
+        email: emp.email,
+        phone: emp.phone || "Not provided"
+      }));
+      setTeamMembers(transformedEmployees);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      setTeamMembers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Role colors
   const roleColors = {
@@ -315,6 +350,24 @@ export default function DashBoard() {
     }
   };
 
+  // Handle filter changes
+  const handleExperienceChange = (e) => {
+    const value = e.target.value;
+    setSelectedExperience(value);
+    fetchFilteredEmployees(value, selectedRoles);
+  };
+
+  const handleRoleChange = (role) => {
+    let updatedRoles;
+    if (selectedRoles.includes(role)) {
+      updatedRoles = selectedRoles.filter(r => r !== role);
+    } else {
+      updatedRoles = [...selectedRoles, role];
+    }
+    setSelectedRoles(updatedRoles);
+    fetchFilteredEmployees(selectedExperience, updatedRoles);
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -341,9 +394,9 @@ export default function DashBoard() {
             <div className="p-4 border-b border-gray-200 space-y-3">
               <div>
                 <h3 className="text-sm font-medium mb-1">Experience</h3>
-                <select className="w-full p-2 border rounded text-sm">
+                <select className="w-full p-2 border rounded text-sm" value={selectedExperience} onChange={handleExperienceChange}>
                   <option>All Levels</option>
-                  <option>Beginner</option>
+                  <option>Junior</option>
                   <option>Mid-Level</option>
                   <option>Senior</option>
                 </select>
@@ -354,7 +407,7 @@ export default function DashBoard() {
                 <div className="space-y-1">
                   {Object.keys(roleColors).map(role => (
                     <label key={role} className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
+                      <input type="checkbox" className="rounded" checked={selectedRoles.includes(role)} onChange={() => handleRoleChange(role)} />
                       <span className="text-sm">{role}</span>
                     </label>
                   ))}

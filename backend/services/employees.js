@@ -47,7 +47,12 @@ async function filterEmployees({ specialty, experience }) {
     const filters = {};
 
     if (specialty) {
-        filters.specialty = specialty;
+        if (Array.isArray(specialty)) {
+            // MongoDB $in query for multiple specialties
+            filters.specialty = { $in: specialty };
+        } else {
+            filters.specialty = specialty;
+        }
     }
 
     if (experience !== undefined) {
