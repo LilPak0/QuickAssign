@@ -9,9 +9,11 @@ router.post('/create', async (req, res) => {
     try {
         const data = req.body
         const create = await insertProject(data)
+        console.log(create)
 
         return res.status(200).json(create)
     } catch (err) {
+        console.error(err);
         return res.status(500).json({ err: err.message });
     }
 })
