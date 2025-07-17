@@ -39,6 +39,7 @@ async function findEmployeesByExperience (experience) {
 async function findAllEmployees() {
     const collection = await getCollection("employees");
     const result = await collection.find().toArray()
+    result.sort((a, b) => a.specialty.localeCompare(b.specialty));
     return result
 }
 

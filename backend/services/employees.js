@@ -61,8 +61,8 @@ async function filterEmployees({ specialty, experience }) {
 
   // Se nenhum filtro for passado, retornar todos
   const result = Object.keys(filters).length === 0
-    ? await findAllEmployees()
-    : await findEmployees(filters);
+    ? await findAllEmployees().sort({ specialty: 1 })
+    : await findEmployees(filters).sort({ specialty: 1 });
 
   return result;
 }
