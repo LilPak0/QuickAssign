@@ -1,4 +1,4 @@
-const { ObjectId } = require('bson');
+const { ObjectId } = require('mongodb');
 const { createProject, findProject, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const { readEmployee } = require('../data/employees');
 
@@ -28,26 +28,16 @@ async function insertProject (data) {
 
     let projectStart = null;
     let projectEnd = null;
-    let status = "In progress";
+    let status = "Waiting to start";
 
     // confirmação se não há campos vazios
     if (!title || !client || !description || !projectNeeds || !deadline) {
         throw new Error("All fields are required: title, client, description, projectNeeds, deadline.");
     }
 
-    /*// criação de variáveis data
-    const start = new Date(projectStart);
-    const end = new Date(deadline);
-
-    if (end < start) {
-        throw new Error("Invalid date");
-    }
-     */
-
     if (!Array.isArray(projectNeeds)) {
         throw new Error("teamProject deve ser um array");
     }
-
 
     const dbData = { title, client, description, projectNeeds, projectStart, deadline, projectEnd, status };
 
@@ -133,4 +123,49 @@ async function removeEmployeeFromAssignment({ projectId, employeeId }) {
 
   return { success: true, result };
 }
-module.exports = { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment }
+
+
+// start project
+async function checkAndStartProject(projectId) {
+  const project = await findProject({ _id: new ObjectId(String(projectId))});
+
+  if (!project) {
+    throw new Error("Projeto não encontrado");
+  }
+  // verificação se é um projeto ainda não iniciado
+  if (project.status !== "Waiting to start") {
+    throw new Error("Project already started.");
+  }
+  // Formato: YYYY-MM-DD
+  const currentDate = new Date().toISOString().split('T')[0]; 
+
+  // Atualiza o status
+  const updated = await updateProject({ _id: project._id }, { status: "Ongoing", projectStart: currentDate });
+
+  return updated;
+}
+
+
+// finish project
+async function finishProject(projectId) {
+  const project = await findProject({ _id: new ObjectId(String(projectId)) });
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  if (project.status !== "Ongoing") {
+    throw new Error("Project is not currently in progress.");
+  }
+
+  const finishDate = new Date().toISOString().split('T')[0];
+
+  const updated = await updateProject({ _id: project._id }, {
+    status: "Completed",
+    projectEnd: finishDate
+  });
+
+  return updated;
+}
+
+module.exports = { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment, checkAndStartProject, finishProject }
