@@ -126,6 +126,7 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
                   value={project.deadline}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
+                  min={new Date().toISOString().slice(0,10)}
                 />
               </div>
 

@@ -69,9 +69,12 @@ router.post('/:id/assign-slot', async (req, res) => {
 router.post('/:id/unassign-slot', async (req, res) => {
   try {
     const { employeeId } = req.body;
-    const { projectId } = req.params;
+    const  projectId  = req.params.id;
+    console.log(`Unassigning employee ${employeeId} from project ${projectId}`);
+
 
     const result = await removeEmployeeFromAssignment({ projectId, employeeId });
+    console.log(result);
     res.status(200).json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });

@@ -260,13 +260,13 @@ export default function DashBoard() {
 
   // Role colors
   const roleColors = {
-    "Backend Developer": { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
-    "Frontend Developer": { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
-    "Designer UX/UI": { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
-    "DevOps Engineer": { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
-    "Data Analyst": { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
-    "Business Analyst": { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
-    "QA Engineer/Tester": { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
+    "Backend Developer": { bg: 'bg-orange-200', text: 'text-orange-900', border: 'border-orange-400', memberBg: 'bg-orange-100' },
+    "Frontend Developer": { bg: 'bg-blue-200', text: 'text-blue-900', border: 'border-blue-400', memberBg: 'bg-blue-100' },
+    "Designer UX/UI": { bg: 'bg-purple-200', text: 'text-purple-900', border: 'border-purple-400', memberBg: 'bg-purple-100' },
+    "DevOps Engineer": { bg: 'bg-teal-200', text: 'text-teal-900', border: 'border-teal-400', memberBg: 'bg-teal-100' },
+    "Data Analyst": { bg: 'bg-cyan-200', text: 'text-cyan-900', border: 'border-cyan-400', memberBg: 'bg-cyan-100' },
+    "Business Analyst": { bg: 'bg-pink-200', text: 'text-pink-900', border: 'border-pink-400', memberBg: 'bg-pink-100' },
+    "QA Engineer/Tester": { bg: 'bg-green-200', text: 'text-green-900', border: 'border-green-400', memberBg: 'bg-green-100' }
   };
 
   // Map short keys to full backend role names

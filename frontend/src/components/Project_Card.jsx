@@ -52,7 +52,7 @@ function DroppableZone({ id, children, role, roleLabel, project, teamMembers, cl
   );
 }
 
-export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember, onCompleteProject, onDeleteProject }) {
+export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember, onCompleteProject, onDeleteProject, allowMemberRemoval = true }) {
   // Get members assigned to this project by role
   const getAssignedMembers = (role) => {
     return teamMembers.filter(member => 
@@ -86,13 +86,13 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
   };
 
   const roleColors = {
-    "Backend Developer": { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800' },
-    "Frontend Developer": { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800' },
-    "Designer UX/UI": { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800' },
-    "DevOps Engineer": { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800' },
-    "Data Analyst": { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800' },
-    "Business Analyst": { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800' },
-    "QA Engineer/Tester": { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-800' }
+    "Backend Developer": { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800', memberBg: 'bg-orange-50' },
+    "Frontend Developer": { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800', memberBg: 'bg-blue-50' },
+    "Designer UX/UI": { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800', memberBg: 'bg-purple-50' },
+    "DevOps Engineer": { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800', memberBg: 'bg-orange-50' },
+    "Data Analyst": { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800', memberBg: 'bg-blue-50' },
+    "Business Analyst": { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800', memberBg: 'bg-purple-50' },
+    "QA Engineer/Tester": { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-800', memberBg: 'bg-green-50' }
   };
 
   return (
@@ -164,7 +164,7 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
               >
                 <div 
                   key={member.id}
-                  className={`p-2 rounded-lg border-2 ${color.bg} ${color.border.replace('border-', 'border-')} `}
+                  className={`p-2 rounded-lg border-2 ${color.memberBg} ${color.border.replace('border-', 'border-')} `}
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center ${color.bg} ${color.text} font-medium text-xs`}>
@@ -197,13 +197,29 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => onRemoveMember(project.id, member.id, fullRole)}
-                      className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                      title="Remove member"
-                    >
-                      <FiTrash2 size={12} />
-                    </button>
+                    {allowMemberRemoval && (
+                      <button
+                        onClick={async () => {
+                          const projectId = project.id;
+                          // Remove from backend
+                          try {
+                            await fetch(`http://localhost:3033/api/projects/${projectId}/unassign-slot`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ employeeId: member.id })
+                            });
+                          } catch (err) {
+                            alert('Failed to remove member from backend.');
+                          }
+                          // Remove from frontend
+                          if (onRemoveMember) onRemoveMember(project.id, member.id, fullRole);
+                        }}
+                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        title="Remove member"
+                      >
+                        <FiTrash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </DroppableZone>
