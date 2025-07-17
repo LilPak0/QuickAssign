@@ -144,7 +144,8 @@ export default function DashBoard() {
   const [projects, setProjects] = useState([]);
   const [draggedMember, setDraggedMember] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [teamMembers, setTeamMembers] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]); // For sidebar (filtered)
+  const [allMembers, setAllMembers] = useState([]); // For project cards (unfiltered)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedExperience, setSelectedExperience] = useState('All Levels');
@@ -175,12 +176,14 @@ export default function DashBoard() {
         }));
         
         setTeamMembers(transformedEmployees);
+        setAllMembers(transformedEmployees); // Keep unfiltered copy for project cards
         setError(null);
       } catch (err) {
         console.error('Error fetching employees:', err);
         setError(err.message);
         // Fallback to empty array on error
         setTeamMembers([]);
+        setAllMembers([]);
       } finally {
         setLoading(false);
       }
@@ -212,11 +215,12 @@ export default function DashBoard() {
         email: emp.email,
         phone: emp.phone || "Not provided"
       }));
-      setTeamMembers(transformedEmployees);
+      setTeamMembers(transformedEmployees); // Update sidebar members (filtered)
+      // Don't update allMembers here - keep them unfiltered
       setError(null);
     } catch (err) {
       setError(err.message);
-      setTeamMembers([]);
+      setTeamMembers([]); // Only clear sidebar members on filter error
     } finally {
       setLoading(false);
     }
@@ -305,7 +309,7 @@ export default function DashBoard() {
 
   function handleDragStart(event) {
     const { active } = event;
-    const member = teamMembers.find(m => m.id.toString() === active.id);
+    const member = allMembers.find(m => m.id.toString() === active.id);
     setDraggedMember(member);
   }
 
@@ -328,7 +332,7 @@ export default function DashBoard() {
   const handleDropMember = async (projectId, memberId, role, slotIndex) => {
     // Convert short key to full role name
     const fullRole = roleKeyToFullRole[role] || role;
-    const member = teamMembers.find(m => m.id === memberId);
+    const member = allMembers.find(m => m.id === memberId);
 
     // Find the backend projectNeeds array for this specialty
     const project = projects.find(p => p.id === projectId);
@@ -511,7 +515,7 @@ export default function DashBoard() {
                     onRemoveMember={handleRemoveMember}
                     onCompleteProject={handleCompleteProject}
                     onDeleteProject={handleDeleteProject}
-                    teamMembers={teamMembers}
+                    teamMembers={allMembers}
                   />
                 ))}
               </div>
