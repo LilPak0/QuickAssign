@@ -222,6 +222,42 @@ export default function DashBoard() {
     }
   };
 
+  // Fetch projects with status 'Waiting to start' from backend
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('http://localhost:3033/api/projects/filters?status=Waiting to start');
+      if (!response.ok) throw new Error('Failed to fetch projects');
+      const projectsData = await response.json();
+      const frontendProjects = projectsData.map((proj) => {
+        const frontendProject = {
+          id: proj._id,
+          name: proj.title,
+          client: proj.client,
+          description: proj.description,
+          requirements: {},
+          assignedMembers: {},
+          createdAt: proj.deadline || new Date().toISOString(),
+          ...proj
+        };
+        if (Array.isArray(proj.projectNeeds)) {
+          proj.projectNeeds.forEach((need) => {
+            frontendProject.requirements[need.specialty] = need.slots;
+            // Build assignedMembers for each role
+            frontendProject.assignedMembers[need.specialty] = need.assigned ? need.assigned.filter(id => id !== null) : [];
+          });
+        }
+        return frontendProject;
+      });
+      setProjects(frontendProjects);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
   // Role colors
   const roleColors = {
     "Backend Developer": { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
@@ -254,13 +290,8 @@ export default function DashBoard() {
     useSensor(KeyboardSensor)
   );
 
-  const handleSubmitProject = (projectData) => {
-    setProjects([...projects, {
-      ...projectData,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      assignedMembers: {} // Track assigned members by role
-    }]);
+  const handleSubmitProject = async (newProject) => {
+    await fetchProjects();
     setIsPopupOpen(false);
   };
 
@@ -284,34 +315,45 @@ export default function DashBoard() {
 
     if (!over) return;
 
-    const memberId = active.id; // Keep as string to match MongoDB _id
-    const [projectId, role] = over.id.split('-');
-    
-    if (projectId && role) {
-      handleDropMember(parseInt(projectId), memberId, role);
+    // over.id should be in the format `${projectId}-${role}-${slotIndex}`
+    const memberId = active.id;
+    const [projectId, role, slotIndexStr] = over.id.split('-');
+    const slotIndex = slotIndexStr ? parseInt(slotIndexStr, 10) : undefined;
+
+    if (projectId && role && slotIndex !== undefined) {
+      handleDropMember(projectId, memberId, role, slotIndex);
     }
   }
 
-  const handleDropMember = (projectId, memberId, role) => {
+  const handleDropMember = async (projectId, memberId, role, slotIndex) => {
     // Convert short key to full role name
     const fullRole = roleKeyToFullRole[role] || role;
     const member = teamMembers.find(m => m.id === memberId);
-    setProjects(projects.map(project => {
-      if (project.id === projectId) {
-        const currentAssigned = project.assignedMembers?.[fullRole] || [];
-        const requiredCount = project.requirements[role]; // use short key for requirements
-        if (!currentAssigned.includes(memberId) && currentAssigned.length < requiredCount) {
-          return {
-            ...project,
-            assignedMembers: {
-              ...project.assignedMembers,
-              [fullRole]: [...currentAssigned, memberId]
-            }
-          };
-        }
-      }
-      return project;
-    }));
+
+    // Find the backend projectNeeds array for this specialty
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    // Use slotIndex directly from drop zone
+    if (slotIndex === undefined || slotIndex < 0) {
+      alert('No empty slot available for this role!');
+      return;
+    }
+
+    try {
+      await fetch(`http://localhost:3033/api/projects/${projectId}/assign-slot`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employeeId: memberId,
+          specialty: role,
+          slotIndex: slotIndex
+        })
+      });
+      await fetchProjects(); // Refresh projects after assignment
+    } catch (err) {
+      alert('Failed to assign member.');
+    }
   };
 
   const handleRemoveMember = (projectId, memberId, role) => {
@@ -330,23 +372,32 @@ export default function DashBoard() {
     }));
   };
 
-  const handleCompleteProject = (projectId) => {
-    const project = projects.find(p => p.id === projectId);
-    if (project) {
-      // Here you can add logic to move project to ongoing status
-      // For now, we'll just remove it from current projects
-      // Later you can implement actual status management
-      console.log('Moving project to ongoing:', project);
-      setProjects(projects.filter(p => p.id !== projectId));
-      
-      // You can add a toast notification or redirect to ongoing page
-      alert('Project moved to ongoing!');
+  const handleCompleteProject = async (projectId) => {
+    if (window.confirm('Mark this project as in progress?')) {
+      try {
+        const response = await fetch(`http://localhost:3033/api/projects/${projectId}/start`, {
+          method: 'POST',
+        });
+        if (!response.ok) throw new Error('Failed to update project status');
+        await fetchProjects(); // Refresh the project list
+        alert('Project status updated to in progress!');
+      } catch (err) {
+        alert('Failed to update project status.');
+      }
     }
   };
 
-  const handleDeleteProject = (projectId) => {
+  const handleDeleteProject = async (projectId) => {
+    console.log('Deleting project:', projectId);
     if (window.confirm('Are you sure you want to delete this project?')) {
-      setProjects(projects.filter(p => p.id !== projectId));
+      try {
+        await fetch(`http://localhost:3033/api/projects/delete/${projectId}`, {
+          method: 'DELETE',
+        });
+        await fetchProjects(); // Refresh projects after deletion
+      } catch (err) {
+        alert('Failed to delete project.');
+      }
     }
   };
 

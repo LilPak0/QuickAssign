@@ -57,6 +57,7 @@ export function ProjectPopup({ isOpen, onClose, onSubmit }) {
         requirements: { 'Backend Developer': 1, "Frontend Developer": 1, "Designer UX/UI": 1, "DevOps Engineer": 1, "Data Analyst": 1, "Business Analyst": 1, "QA Engineer/Tester": 1 },
         deadline: ''
       });
+      if (onSubmit) onSubmit(); // Trigger dashboard fetch
       onClose();
     } catch (err) {
       alert(err.message);

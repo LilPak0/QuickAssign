@@ -101,20 +101,24 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
         <div className="flex justify-between items-start mb-3">
           <h3 className="font-bold text-base text-gray-800">{project.name}</h3>
           <div className="flex gap-1">
-            <button 
-              onClick={() => onCompleteProject(project.id)}
-              className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-700 flex items-center justify-center transition-colors"
-              title="Mark as complete"
-            >
-              <FiCheck size={12} />
-            </button>
-            <button 
-              onClick={() => onDeleteProject(project.id)}
-              className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 flex items-center justify-center transition-colors"
-              title="Delete project"
-            >
-              <FiX size={12} />
-            </button>
+            {onCompleteProject && (
+              <button 
+                onClick={() => onCompleteProject(project.id)}
+                className="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-700 flex items-center justify-center transition-colors"
+                title="Mark as complete"
+              >
+                <FiCheck size={12} />
+              </button>
+            )}
+            {onDeleteProject && (
+              <button 
+                onClick={() => onDeleteProject(project.id)}
+                className="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 flex items-center justify-center transition-colors"
+                title="Delete project"
+              >
+                <FiX size={12} />
+              </button>
+            )}
           </div>
         </div>
         
@@ -145,67 +149,83 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
           Object.entries(project.requirements).map(([role, count]) => {
             const fullRole = roleKeyToFullRole[role] || role;
             const color = roleColors[fullRole] || { bg: 'bg-gray-100', border: 'border-gray-300', text: 'text-gray-800' };
-            return count > 0 && (
+            const assignedMembers = getAssignedMembers(fullRole);
+            // Render assigned members first
+            const assignedSlots = assignedMembers.map((member, idx) => (
               <DroppableZone
-                key={role}
-                id={`${project.id}-${role}`}
+                key={`assigned-${project.id}-${role}-${idx}`}
+                id={null} // Not droppable
                 role={fullRole}
                 roleLabel={role}
                 project={project}
                 teamMembers={teamMembers}
                 color={color}
+                className="mb-2"
               >
-                {/* Assigned Members */}
-                <div className="space-y-1">
-                  {getAssignedMembers(fullRole).map(member => (
-                    <div 
-                      key={member.id}
-                      className={`p-2 rounded-lg border-2 ${color.bg} ${color.border.replace('border-', 'border-')} `}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${color.bg} ${color.text} font-medium text-xs`}>
-                          {member.name.charAt(0)}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-xs">{member.name}</p>
-                          <div className="flex gap-1 mt-0.5">
-                            <span className={`text-xs px-1 py-0.5 rounded ${
-                              member.experience === 'Senior' ? 'bg-green-100 text-green-700' :
-                              member.experience === 'Mid-Level' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-blue-100 text-blue-700'
-                            }`}>
-                              {member.experience}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1 mt-0.5">
-                            {member.skills.slice(0, 2).map(skill => (
-                              <span 
-                                key={skill} 
-                                className="text-xs px-1 py-0.5 bg-gray-100 text-gray-600 rounded"
-                              >
-                                {skill}
-                              </span>
-                            ))}
-                            {member.skills.length > 2 && (
-                              <span className="text-xs text-gray-500">
-                                +{member.skills.length - 2}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => onRemoveMember(project.id, member.id, fullRole)}
-                          className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                          title="Remove member"
-                        >
-                          <FiTrash2 size={12} />
-                        </button>
+                <div 
+                  key={member.id}
+                  className={`p-2 rounded-lg border-2 ${color.bg} ${color.border.replace('border-', 'border-')} `}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${color.bg} ${color.text} font-medium text-xs`}>
+                      {member.name.charAt(0)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-xs">{member.name}</p>
+                      <div className="flex gap-1 mt-0.5">
+                        <span className={`text-xs px-1 py-0.5 rounded ${
+                          member.experience === 'Senior' ? 'bg-green-100 text-green-700' :
+                          member.experience === 'Mid-Level' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {member.experience}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {member.skills.slice(0, 2).map(skill => (
+                          <span 
+                            key={skill} 
+                            className="text-xs px-1 py-0.5 bg-gray-100 text-gray-600 rounded"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                        {member.skills.length > 2 && (
+                          <span className="text-xs text-gray-500">
+                            +{member.skills.length - 2}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  ))}
+                    <button
+                      onClick={() => onRemoveMember(project.id, member.id, fullRole)}
+                      className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                      title="Remove member"
+                    >
+                      <FiTrash2 size={12} />
+                    </button>
+                  </div>
                 </div>
               </DroppableZone>
-            );
+            ));
+            // Render empty droppable slots
+            const emptySlots = Array.from({ length: count - assignedMembers.length }).map((_, idx) => (
+              <DroppableZone
+                key={`empty-${project.id}-${role}-${idx}`}
+                id={`${project.id}-${role}-${assignedMembers.length + idx}`}
+                role={fullRole}
+                roleLabel={role}
+                project={project}
+                teamMembers={teamMembers}
+                color={color}
+                className="mb-2"
+              >
+                <div className="flex items-center justify-center h-12 text-gray-400 text-xs">
+                  Drop member here
+                </div>
+              </DroppableZone>
+            ));
+            return [ ...assignedSlots, ...emptySlots ];
           })
         }
       </div>

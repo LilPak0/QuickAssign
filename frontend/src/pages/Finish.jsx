@@ -1,20 +1,92 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from '../components/Navbar';
 import { ProjectCard } from '../components/Project_Card';
 
-export default function Finish({ projects = [], teamMembers = [] }) {
+export default function Finish() {
+  const [projects, setProjects] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFinishedProjects = async () => {
+      try {
+        const response = await fetch('http://localhost:3033/api/projects/filters?status=Completed');
+        if (!response.ok) throw new Error('Failed to fetch finished projects');
+        const projectsData = await response.json();
+        const frontendProjects = projectsData.map((proj) => {
+          const frontendProject = {
+            id: proj._id,
+            name: proj.title,
+            client: proj.client,
+            description: proj.description,
+            requirements: {},
+            assignedMembers: {},
+            createdAt: proj.deadline || new Date().toISOString(),
+            ...proj
+          };
+          if (Array.isArray(proj.projectNeeds)) {
+            proj.projectNeeds.forEach((need) => {
+              frontendProject.requirements[need.specialty] = need.slots;
+              // Build assignedMembers for each role
+              frontendProject.assignedMembers[need.specialty] = need.assigned ? need.assigned.filter(id => id !== null) : [];
+            });
+          }
+          return frontendProject;
+        });
+        setProjects(frontendProjects);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch('http://localhost:3033/api/employees/allemployees');
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        const employees = await response.json();
+        const transformedEmployees = employees.map(emp => ({
+          id: emp._id,
+          name: `${emp.firstName} ${emp.lastName}`,
+          role: emp.specialty,
+          experience: emp.experience,
+          skills: emp.skills,
+          email: emp.email,
+          phone: emp.phone || "Not provided"
+        }));
+        setTeamMembers(transformedEmployees);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFinishedProjects();
+    fetchTeamMembers();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 w-full">
       <NavBar />
       <div className="flex-1 p-6 overflow-y-auto w-full">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Finished Projects</h1>
-        {projects.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="text-gray-500">Loading finished projects...</div>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="text-red-500">Error: {error}</div>
+          </div>
+        ) : projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {projects.map(project => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 teamMembers={teamMembers}
+                // Do not pass onDeleteProject or onCompleteProject
               />
             ))}
           </div>
