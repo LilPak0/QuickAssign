@@ -160,7 +160,13 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
                   {getAssignedMembers(fullRole).map(member => (
                     <div 
                       key={member.id}
-                      className={`p-2 rounded-lg border-2 ${color.bg} ${color.border.replace('border-', 'border-')} `}
+                      className={`p-2 rounded-lg border-2 ${
+                        fullRole === 'Backend Developer' || fullRole === 'DevOps Engineer' ? 'bg-orange-50 border-orange-100' :
+                        fullRole === 'Frontend Developer' || fullRole === 'Data Analyst' ? 'bg-blue-50 border-blue-100' :
+                        fullRole === 'Designer UX/UI' || fullRole === 'Business Analyst' ? 'bg-purple-50 border-purple-100' :
+                        fullRole === 'QA Engineer/Tester' ? 'bg-green-50 border-green-100' :
+                        'bg-gray-50 border-gray-100'
+                      }`}
                     >
                       <div className="flex items-center gap-2">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${color.bg} ${color.text} font-medium text-xs`}>
