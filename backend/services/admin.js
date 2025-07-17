@@ -6,7 +6,7 @@ const { addToken } = require('./authToken');
 async function createAdmin(data) {
     
     const { firstName, lastName, email, password, passwordConfirmation, role } = data
-
+    
     // confirmação se email já existe
     const user = await findAdmin({email})
     if (user && email === user.email) {
