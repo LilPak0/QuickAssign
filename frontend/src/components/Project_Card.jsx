@@ -136,7 +136,7 @@ export function ProjectCard({ project, onDropMember, teamMembers, onRemoveMember
           </div>
           <div className="flex items-center gap-1">
             <FiCalendar size={12} />
-            <span>{formatDate(project.projectStart)}</span>
+            <span>{formatDate(project.deadline)}</span>
           </div>
           <div className="flex items-center gap-1">
             <FiCheckSquare size={12} />
