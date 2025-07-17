@@ -25,11 +25,16 @@ async function findAllProjects () {
 
 
 // Read projects by Status
-async function findProjectsByStatus (status) {
-    const collection = await getCollection("projects");
-    const result = await collection.find({ status: status}).toArray()
-    return result
+async function findProjectsByStatus(status) {
+  const collection = await getCollection("projects");
+  const result = await collection
+    .find({ status: status })
+    .sort({ deadline: 1 }) // ordem crescente (mais próximo → mais distante)
+    .toArray();
+
+  return result;
 }
+
 
 // Update projects
 async function updateProject (filter, update) {

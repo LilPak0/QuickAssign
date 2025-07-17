@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from '../components/Navbar';
 import { ProjectCard } from '../components/Project_Card';
 
-export default function Ongoing({ projects = [], teamMembers = [] }) {
+
+export default function Ongoing({ teamMembers = [] }) {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const response = await fetch("http://localhost:3033/api/projects/filters?status=Ongoing");
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error("Error:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, []);
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 w-full">
       <NavBar />
@@ -12,7 +36,7 @@ export default function Ongoing({ projects = [], teamMembers = [] }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {projects.map(project => (
               <ProjectCard
-                key={project.id}
+                key={project._id}
                 project={project}
                 teamMembers={teamMembers}
                 // No drag/drop or remove actions

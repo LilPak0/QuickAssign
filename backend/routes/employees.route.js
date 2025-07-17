@@ -1,6 +1,8 @@
 const express = require('express');
 const { insertEmployee, filterEmployees } = require('../services/employees');
 const { findAllEmployees } = require('../data/employees');
+const { verifyToken } = require('../middlewares/auth.middleware');
+
 const router = express.Router();
 
 // POST criação de um employee

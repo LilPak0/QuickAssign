@@ -1,5 +1,6 @@
 const express = require('express');
-const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment } = require('../services/projects');
+const { ObjectId } = require('mongodb')
+const { insertProject, assignEmployeeToSlot, removeEmployeeFromAssignment, checkAndStartProject, finishProject } = require('../services/projects');
 const { createProject, findProject, findAllProjects, findProjectsByStatus, updateProject, deleteProject } = require('../data/projects');
 const router = express.Router();
 
@@ -8,9 +9,11 @@ router.post('/create', async (req, res) => {
     try {
         const data = req.body
         const create = await insertProject(data)
+        console.log(create)
 
         return res.status(200).json(create)
     } catch (err) {
+        console.error(err);
         return res.status(500).json({ err: err.message });
     }
 })
@@ -38,18 +41,18 @@ router.get('/filters', async (req, res) => {
     }
 })
 
-// Remover projeto
+// DELETE Remover projeto
 router.delete('/delete/:id', async (req, res) => {
     try {
         const id = req.params.id
-        const result = await deleteProject({ id })
+        const result = await deleteProject({ _id: new ObjectId(String(id)) })
         res.status(200).json(result)
     } catch (err) {
         res.status(500).json({ error: err.message })
     }
 })
 
-// Adicionar ID ao slot vazio
+// POST Adicionar ID ao slot vazio
 router.post('/:id/assign-slot', async (req, res) => {
     try {
         const projectId = req.params.id;
@@ -62,8 +65,8 @@ router.post('/:id/assign-slot', async (req, res) => {
     }
 })
 
-// Retirar ID do slot
-router.post('/:projectId/unassign-slot', async (req, res) => {
+// POST Retirar ID do slot
+router.post('/:id/unassign-slot', async (req, res) => {
   try {
     const { employeeId } = req.body;
     const { projectId } = req.params;
@@ -74,5 +77,27 @@ router.post('/:projectId/unassign-slot', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+// POST start project
+router.post('/:id/start', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const result = await checkAndStartProject(id);
+        res.status(200).json({ message: "Project in progress", data: result})
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// POST finish match
+router.post('/:id/finish', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await finishProject(id);
+        res.status(200).json({ message: "Project completed", data: result})
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
 
 module.exports = router;
